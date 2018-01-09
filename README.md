@@ -1,7 +1,8 @@
-# bchain
-BChain implementation in Go
+# BChain implementation in Go
 
-## To compile
+Caveat: This is just a test to see that we can use gRPC bidirectional stream connections to implement this.
+
+## How to compile and run bchain
 
 First ensure that you have Go installed, and `$GOPATH` set up, along with `$PATH` set to include `$GOPATH/bin`. (This should all be according to standard Go install instructions.)
 
