@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package bchain;
+
+service BChain {
+    // rpc Request(stream ClientRequest) returns (Empty) {}
+    // rpc Reply(stream ClientReply) returns (Empty) {}
+    rpc Chain(stream ChainMsg) returns (stream AckMsg) {}
+    // rpc Ack(stream AckMsg) returns (Empty) {}
+}
+
+message ChainMsg {
+    int64 ID = 1;
+    string Op = 2;
+}
+
+message AckMsg {
+    int64 ID = 1;
+}
+
+// message Empty {}
+
+// message ClientRequest {
+//     string Operation = 1;
+// 	int64 Timestamp  = 2;
+//     int64 ClientID   = 3;
+// }
+
+// message ClientReply {
+//     string Operation = 1;
+// 	int64 Timestamp  = 2;
+//     int64 ClientID   = 3;
+// }
+
+// message ChainMsg {
+//     int64 ViewNumber     = 1; // v
+//     int64 Rechainings    = 2; // ch (rechainings in view v)
+//     int64 SequenceNumber = 3; // N
+//     ClientRequest Msg    = 4; // m (the client request message)
+//     int64 ClientID       = 5;
+//     //TODO Rest of message fields ignored for now.    
+// }
+
+// message AckMsg {
+//     int64 ViewNumber     = 1; // v
+//     int64 Rechainings    = 2; // ch (rechainings in view v)
+//     int64 SequenceNumber = 3; // N
+//     // MsgDigest Digest = 4;
+//     // int64 ClientID       = 5;
+//     //TODO Rest of message fields ignored for now.
+// }
