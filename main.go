@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -57,9 +58,11 @@ func main() {
 	go peer.Serve()
 	// set up and connect to chain
 	chain := NewChain(addrs, peer)
+	// set up dial timeout to wait for one minute to connect if server/peer isn't up yet
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
 	// connect to chain (this peer's successor)
-	// wait for one minute to connect if server isn't up yet
-	if isHead := chain.Connect(time.Minute); isHead {
+	if isHead := chain.Connect(ctx); isHead {
 		log.Println("I'm the head of the chain!")
 		for i := 0; i < 10; i++ {
 			chainMsg := &bc.ChainMsg{
@@ -100,17 +103,21 @@ func getAddrs(saddrs string, myidx int) ([]string, string) {
 	if myidx == -1 {
 		// Search for hostname in provide list of addresses
 		myHost, err := os.Hostname()
-		log.Printf("hostname: %v", myHost)
 		if err != nil {
 			log.Fatal(err)
 		}
+		ip, err := net.LookupIP(myHost)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("hostname: %v (%v)", myHost, ip)
 		for _, adr := range addrs {
 			log.Printf("adr: %v", adr)
 			host, _, err := net.SplitHostPort(adr)
 			if err != nil {
 				log.Fatal(err)
 			}
-			if host == myHost {
+			if host == myHost || host == ip[0].String() {
 				return addrs, adr
 			}
 		}

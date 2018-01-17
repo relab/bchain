@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"time"
 )
 
 // keys for the chain map
@@ -27,15 +26,10 @@ func NewChain(addrs []string, peer *peer) *Chain {
 
 // Connect connects to this peer's successor and
 // returns true if this peer is the head of the chain.
-func (c *Chain) Connect(wait4ConnDelay time.Duration) bool {
+func (c *Chain) Connect(ctx context.Context) bool {
 	if succ, ok := c.cmap[successor]; ok {
 		log.Println("connecting to:", succ)
-		//TODO pass chain or something else in here.
-		// set up dial timeout to allow initial connections to wait for the peer to come up
-		dialCtx, cancel := context.WithTimeout(context.Background(), wait4ConnDelay)
-		//TODO this cancel is problematic?? Need to move context out of Connect()
-		defer cancel()
-		go c.peer.connect(dialCtx, succ)
+		go c.peer.connect(ctx, succ)
 	} else {
 		log.Println("I'm the tail, so I won't be connecting to anyone!")
 	}
@@ -43,6 +37,8 @@ func (c *Chain) Connect(wait4ConnDelay time.Duration) bool {
 }
 
 func (c *Chain) Close() {
+	// c.peer
+	// TODO should we shut down all connections when rechaining?
 }
 
 //TODO make test cases for this: (using property-based testing)

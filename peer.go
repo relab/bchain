@@ -96,6 +96,19 @@ func (p *peer) connect(dialCtx context.Context, server string) {
 	p.Lock()
 	p.haveSucc = true
 	p.Unlock()
+
+	//TODO CHECK IF THIS WORKS
+	// for {
+	// 	select {
+	// 	case chainMsg := <-p.chainMsgQueue:
+	// 		if err := stream.Send(chainMsg); err != nil {
+	// 			log.Fatalf("failed to send chain msg: %v", err)
+	// 		}
+	// 	case <-dialCtx.Done():// OR some other way to close the connection
+	// 		stream.CloseSend()
+	// 		return
+	// 	}
+	// }
 	for chainMsg := range p.chainMsgQueue {
 		if err := stream.Send(chainMsg); err != nil {
 			log.Fatalf("failed to send chain msg: %v", err)
@@ -117,6 +130,7 @@ func dialOptions(certFile string) grpc.DialOption {
 }
 
 func (p *peer) haveSuccessor() bool {
+	//TODO We can avoid this method by blocking on Chain() waiting for sync.Once() to determine if haveSucc
 	p.Lock()
 	defer p.Unlock()
 	return p.haveSucc
